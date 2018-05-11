@@ -1,3 +1,10 @@
+Date: 05/11/2018
+Version: 0.3
+
+- updates and debugging
+
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
 Date: 03/15/2016
 Version: 0.2
 
