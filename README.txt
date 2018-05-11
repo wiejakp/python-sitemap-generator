@@ -2,6 +2,11 @@
 - Version: 0.2
 - Update: 03/15/2016
 - Author: Przemek Wiejak @ przemek@wiejak.us
+- Source: https://pytonsitemapgen.codeplex.com/
+
+Python Site Map Generator uses python multi-threaded approach to read all links accessible through the Web site and generate proper sitemap for SEO purposes.
+Script was meant to use threading technology to allow easy and very fast approach while generating sitemaps for your Web pages.
+The script will run under Linux operating system which supports Python 3 language.
 
 ## REQUIREMENTS
 - Python 3
