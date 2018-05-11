@@ -14,3 +14,5 @@ The script will run under Linux operating system which supports Python 3 languag
 - Set up the 'InitialURL' variable to point to Web site which you want to generate sitemap to
 - Set script to executable: sudo chmod +x python-sitemap-generator.py
 - Run script: ./python-sitemap-generator.py
+
+![Python Sitemap Generator](https://raw.github.com/wiejakp/python-sitemap-generator/master/screenshot.png)
