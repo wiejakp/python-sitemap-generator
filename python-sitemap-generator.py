@@ -2,7 +2,8 @@
 
 # Python Sitemap Generator
 # Version: 0.2
-# Przemyslaw M. Wiejak @ przemek@wiejak.us
+# Przemek Wiejak @ przemek@wiejak.us
+# GitHub: https://github.com/wiejakp/python-sitemap-generator
 
 import threading
 import urlparse
@@ -10,12 +11,18 @@ import urllib2
 import time
 import email.utils as eut
 
+from pprint import pprint
+from var_dump import var_dump
 from lxml import etree
 from urlparse import urlparse
 from lxml.html.soupparser import fromstring
 from urlparse import urljoin
 
 # sudo apt-get install python-beautifulsoup
+# sudo apt-get install python-pip
+# sudo apt-get install python3-pip
+# pip install setuptools
+# pip install var_dump
 
 queue = []
 checked = []
@@ -24,10 +31,15 @@ types = ['text/html']
 
 link_threads = []
 
-MaxThreads = 30
-MaxSubThreads = 10 
+#MaxThreads = 30
+#MaxSubThreads = 10
 
-InitialURL = 'WEBSITE ADDRESS'
+# adjust to your liking
+MaxThreads = 10
+MaxSubThreads = 10
+
+# DWFINE YOUR URL
+InitialURL = 'URL'
 
 InitialURLInfo = urlparse(InitialURL)
 InitialURLLen = len(InitialURL.split('/'))
@@ -38,6 +50,10 @@ InitialURLBase = InitialURLScheme + '://' + InitialURLNetloc
 netloc_prefix_str = 'www.'
 netloc_prefix_len = len(netloc_prefix_str)
 
+run_ini = None
+run_end = None
+run_dif = None
+
 filename = 'sitemap.xml'
 
 request_headers = {
@@ -45,32 +61,41 @@ request_headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:40.0) Gecko/20100101 Firefox/40.0",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     "Referer": "http://thewebsite.com",
-    "Connection": "keep-alive" 
+    "Connection": "keep-alive"
 }
 
 if InitialURLNetloc.startswith(netloc_prefix_str):
     InitialURLNetloc = InitialURLNetloc[netloc_prefix_len:]
 
 class RunCrawler(threading.Thread):
+    # crawler start
+    run_ini = time.time()
+    run_end = None
+    run_dif = None
+
+    print("")
+    print(InitialURL)
+    print("")
+
     def __init__(self, url):
         threading.Thread.__init__(self)
-        
+
         ProcessURL(url)
-        
+
         self.start()
-            
+
     def run(self):
         run = True
-        
+
         while run:
             for index, thread in enumerate(threads):
                 if thread.isAlive() == False:
                     del threads[index]
-                    
+
             for index, thread in enumerate(link_threads):
                 if thread.isAlive() == False:
                     del link_threads[index]
-                    
+
             for index, obj in enumerate(queue):
                 if len(threads) < MaxThreads:
                     thread = Crawl(index, obj)
@@ -79,128 +104,171 @@ class RunCrawler(threading.Thread):
                     del queue[index]
                 else:
                     break
-                
+
             if len(queue) == 0 and len(threads) == 0 and len(link_threads) == 0:
                 run = False
-                
+
                 self.done()
             else:
                 print 'Threads: ', len(threads), ' Queue: ', len(queue), ' Checked: ', len(checked), ' Link Threads: ', len(link_threads)
                 time.sleep(1)
-                
-    def done(self):        
+
+    def done(self):
         print 'Checked: ', len(checked)
         print 'Running XML Generator...'
-        
+
         # Running sitemap-generating script
         Sitemap()
-        
+
+        self.run_end = time.time()
+        self.run_dif = self.run_end - self.run_ini
+
+        print(self.run_dif)
+
+
 class Sitemap:
     urlset = None
     encoding = 'UTF-8'
     xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'
-    
+
     def __init__(self):
         self.root()
         self.children()
         self.xml()
-                
+
     def done(self):
         print 'Done'
-        
+
     def root(self):
         self.urlset = etree.Element('urlset')
         self.urlset.attrib['xmlns'] = self.xmlns
-        
-    def children(self):        
+
+    def children(self):
         for index, obj in enumerate(checked):
             url = etree.Element('url')
             loc = etree.Element('loc')
             lastmod = etree.Element('lastmod')
             changefreq = etree.Element('changefreq')
             priority = etree.Element('priority')
-            
+
             loc.text = obj['url']
-            lastmod.text = FormatDate(obj['obj'].info().getheader('Last-Modified'))
-            
+            lastmod_info =  None
+            lastmod_header = None
+            lastmod.text = None
+
+            if hasattr(obj['obj'], 'info'):
+                lastmod_info = obj['obj'].info()
+                lastmod_header = lastmod_info.getheader('Last-Modified')
+
+            # check if 'Last-Modified' header exists
+            if lastmod_header != None:
+                lastmod.text = FormatDate(lastmod_header)
+
             if loc.text != None:
                 url.append(loc)
-            
+
             if lastmod.text != None:
                 url.append(lastmod)
-                
+
             if changefreq.text != None:
                 url.append(changefreq)
-                
+
             if priority.text != None:
                 url.append(priority)
-            
+
             self.urlset.append(url)
-            
+
     def xml(self):
         f = open(filename, 'w')
         print >> f, etree.tostring(self.urlset, xml_declaration = True, encoding = self.encoding)
         f.close()
-        
+
         print 'Sitemap saved in: ', filename
-            
+
+
 class Crawl(threading.Thread):
     def __init__(self, index, obj):
         threading.Thread.__init__(self)
-        
+
         self.index = index
         self.obj = obj
-        
+
         self.start()
+
 
     def run(self):
         temp_status = None
         temp_object = None
-        
+
         try:
             temp_req = urllib2.Request(self.obj['url'], headers=request_headers)
             temp_res = urllib2.urlopen(temp_req)
             temp_code = temp_res.getcode()
             temp_type = temp_res.info().type
-            
+
             temp_status = temp_res.getcode()
             temp_object = temp_res
-                        
+
             if temp_code == 200:
                 if temp_type in types:
                     temp_content = temp_res.read()
+
+                    #var_dump(temp_content)
+
                     temp_data = fromstring(temp_content)
 
                     temp_thread = threading.Thread(target=ParseThread, args=(self.obj['url'], temp_data))
                     link_threads.append(temp_thread)
                     temp_thread.start()
-                    
+
         except urllib2.HTTPError as e:
             temp_status = e.code
             pass
-        
+
         self.obj['obj'] = temp_object
         self.obj['sta'] = temp_status
-        
+
         ProcessChecked(self.obj)
+
+
+def dump(obj):
+    '''return a printable representation of an object for debugging'''
+    newobj=obj
+
+    if '__dict__' in dir(obj):
+      newobj=obj.__dict__
+
+      if ' object at ' in str(obj) and not newobj.has_key('__type__'):
+          newobj['__type__']=str(obj)
+
+          for attr in newobj:
+              newobj[attr]=dump(newobj[attr])
+
+    return newobj
+
 
 def FormatDate(datetime):
     datearr = eut.parsedate(datetime)
+    date = None
 
-    year = str(datearr[0])
-    month = str(datearr[1])
-    day = str(datearr[2])
+    try:
+        year = str(datearr[0])
+        month = str(datearr[1])
+        day = str(datearr[2])
 
-    if int(month) < 10:
-        month = '0' + month
+        if int(month) < 10:
+            month = '0' + month
 
-    if int(day) < 10:
-        day = '0' + day
+        if int(day) < 10:
+            day = '0' + day
 
-    date = year + '-' + month + '-' + day
-    
+        date = year + '-' + month + '-' + day
+    except IndexError:
+        pprint(datearr)
+
     return date
-        
+
+
 def ParseThread(url, data):
     temp_links = data.xpath('//a')
 
@@ -217,16 +285,17 @@ def ParseThread(url, data):
 
             if path != False:
                 ProcessURL(path, temp_src)
-        
+
+
 def JoinURL(src, url):
     value = False
-    
+
     url_info = urlparse(url)
     src_info = urlparse(src)
-    
+
     url_scheme = url_info.scheme
     src_scheme = src_info.scheme
-        
+
     url_netloc = url_info.netloc
     src_netloc = src_info.netloc
 
@@ -248,9 +317,10 @@ def JoinURL(src, url):
         #print path
 
         value = path
-    
+
     return value
-        
+
+
 def ProcessURL(url, src = None, obj = None):
     found = False
     
@@ -283,5 +353,5 @@ def ProcessChecked(obj):
             
     if found == False:
         checked.append(obj)
-    
+
 RunCrawler(InitialURL)
