@@ -1,22 +1,26 @@
 #!/usr/bin/python
 
 # Python Sitemap Generator
-# Version: 0.2
+# Version: 0.4
+
+# Updated to new Version with Python 3
+
 # Przemek Wiejak @ przemek@wiejak.us
 # GitHub: https://github.com/wiejakp/python-sitemap-generator
 
 import threading
-import urlparse
-import urllib2
 import time
+from urllib.request import urlopen
+from urllib.request import Request
+from urllib.request import HTTPError
+from urllib.parse import urljoin
+from urllib.parse import urlparse
 import email.utils as eut
 
 from pprint import pprint
 from var_dump import var_dump
 from lxml import etree
-from urlparse import urlparse
 from lxml.html.soupparser import fromstring
-from urlparse import urljoin
 
 # sudo apt-get install python-beautifulsoup
 # sudo apt-get install python-pip
@@ -27,7 +31,7 @@ from urlparse import urljoin
 queue = []
 checked = []
 threads = []
-types = ['text/html']
+types = 'text/html'
 
 link_threads = []
 
@@ -39,7 +43,7 @@ MaxThreads = 10
 MaxSubThreads = 10
 
 # DWFINE YOUR URL
-InitialURL = 'URL'
+InitialURL = 'http://test.at/'
 
 InitialURLInfo = urlparse(InitialURL)
 InitialURLLen = len(InitialURL.split('/'))
@@ -57,10 +61,8 @@ run_dif = None
 filename = 'sitemap.xml'
 
 request_headers = {
-    "Accept-Language": "en-US,en;q=0.5",
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:40.0) Gecko/20100101 Firefox/40.0",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-    "Referer": "http://thewebsite.com",
     "Connection": "keep-alive"
 }
 
@@ -110,12 +112,12 @@ class RunCrawler(threading.Thread):
 
                 self.done()
             else:
-                print 'Threads: ', len(threads), ' Queue: ', len(queue), ' Checked: ', len(checked), ' Link Threads: ', len(link_threads)
+                print ('Threads: ', len(threads), ' Queue: ', len(queue), ' Checked: ', len(checked), ' Link Threads: ', len(link_threads))
                 time.sleep(1)
 
     def done(self):
-        print 'Checked: ', len(checked)
-        print 'Running XML Generator...'
+        print ('Checked: ', len(checked))
+        print ('Running XML Generator...')
 
         # Running sitemap-generating script
         Sitemap()
@@ -137,7 +139,7 @@ class Sitemap:
         self.xml()
 
     def done(self):
-        print 'Done'
+        print ('Done')
 
     def root(self):
         self.urlset = etree.Element('urlset')
@@ -158,7 +160,8 @@ class Sitemap:
 
             if hasattr(obj['obj'], 'info'):
                 lastmod_info = obj['obj'].info()
-                lastmod_header = lastmod_info.getheader('Last-Modified')
+                lastmod_header = lastmod_info["Last-Modified"]
+
 
             # check if 'Last-Modified' header exists
             if lastmod_header != None:
@@ -180,10 +183,11 @@ class Sitemap:
 
     def xml(self):
         f = open(filename, 'w')
-        print >> f, etree.tostring(self.urlset, xml_declaration = True, encoding = self.encoding)
+        
+        print (etree.tostring(self.urlset, pretty_print=True, encoding="unicode", method="xml"), file=f)
         f.close()
 
-        print 'Sitemap saved in: ', filename
+        print ('Sitemap saved in: ', filename)
 
 
 class Crawl(threading.Thread):
@@ -201,16 +205,17 @@ class Crawl(threading.Thread):
         temp_object = None
 
         try:
-            temp_req = urllib2.Request(self.obj['url'], headers=request_headers)
-            temp_res = urllib2.urlopen(temp_req)
+            print(self.obj['url'])
+            temp_req = Request(self.obj['url'], headers=request_headers)
+            temp_res = urlopen(temp_req)
             temp_code = temp_res.getcode()
-            temp_type = temp_res.info().type
+            temp_type = temp_res.info()["Content-Type"]
 
             temp_status = temp_res.getcode()
             temp_object = temp_res
 
             if temp_code == 200:
-                if temp_type in types:
+                if types in temp_type:
                     temp_content = temp_res.read()
 
                     #var_dump(temp_content)
@@ -221,7 +226,7 @@ class Crawl(threading.Thread):
                     link_threads.append(temp_thread)
                     temp_thread.start()
 
-        except urllib2.HTTPError as e:
+        except HTTPError as e:
             temp_status = e.code
             pass
 
@@ -323,34 +328,34 @@ def JoinURL(src, url):
 
 def ProcessURL(url, src = None, obj = None):
     found = False
-    
+
     for value in queue:
         if value['url'] == url:
             found = True
             break
-    
+
     for value in checked:
         if value['url'] == url:
             found = True
             break
-            
+
     if found == False:
         temp = {}
         temp['url'] = url
         temp['src'] = src
         temp['obj'] = obj
         temp['sta'] = None
-        
+
         queue.append(temp)
 
 def ProcessChecked(obj):
     found = False
-    
+
     for item in checked:
         if item['url'] == obj['url']:
             found = True
             break
-            
+
     if found == False:
         checked.append(obj)
 
