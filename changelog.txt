@@ -1,7 +1,7 @@
 Date: 12/22/2021
 Version: 0.4
 
-- updage Python version to version 3 (thank you https://github.com/chainstair)
+- upgrade Python version to version 3 (thank you https://github.com/chainstair)
 - fix Python 3 object parameter issue (thank you https://github.com/TudorAndrei)
 - fix issue with URL containing query string
 
