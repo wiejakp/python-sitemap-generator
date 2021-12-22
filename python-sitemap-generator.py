@@ -3,9 +3,7 @@
 # Python Sitemap Generator
 # Version: 0.4
 
-# Updated to new Version with Python 3
-
-# Przemek Wiejak @ przemek@wiejak.us
+# Przemek Wiejak @ przemek@wiejak.app
 # GitHub: https://github.com/wiejakp/python-sitemap-generator
 
 import threading
@@ -39,11 +37,11 @@ link_threads = []
 #MaxSubThreads = 10
 
 # adjust to your liking
-MaxThreads = 10
-MaxSubThreads = 10
+MaxThreads = 20
+MaxSubThreads = 20
 
-# DWFINE YOUR URL
-InitialURL = 'http://test.at/'
+# DWFINE YOUR URL - CUSTOM URL!
+InitialURL = 'https://hublist.pwiam.com/'
 
 InitialURLInfo = urlparse(InitialURL)
 InitialURLLen = len(InitialURL.split('/'))
@@ -91,11 +89,11 @@ class RunCrawler(threading.Thread):
 
         while run:
             for index, thread in enumerate(threads):
-                if thread.isAlive() == False:
+                if thread.is_alive() == False:
                     del threads[index]
 
             for index, thread in enumerate(link_threads):
-                if thread.isAlive() == False:
+                if thread.is_alive() == False:
                     del link_threads[index]
 
             for index, obj in enumerate(queue):
@@ -205,7 +203,6 @@ class Crawl(threading.Thread):
         temp_object = None
 
         try:
-            print(self.obj['url'])
             temp_req = Request(self.obj['url'], headers=request_headers)
             temp_res = urlopen(temp_req)
             temp_code = temp_res.getcode()
@@ -313,6 +310,9 @@ def JoinURL(src, url):
     if url_netloc == '' or url_netloc == InitialURLNetloc:
         url_path = url_info.path
         src_path = src_info.path
+
+        if url_info.query:
+            url_path = url_path + '?' + url_info.query
 
         src_new_path = urljoin(InitialURLBase, src_path)
         url_new_path = urljoin(src_new_path, url_path)
