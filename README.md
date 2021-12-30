@@ -1,7 +1,7 @@
 # Python Sitemap Generator
 
-- Version: 0.4
-- Update: 22/22/2021
+- Version: 0.4.1
+- Update: 2021/12/30
 - Author: Przemek Wiejak @ przemek@wiejak.app
 
 Python Site Map Generator uses python multi-threaded approach to read all links accessible through the Web site and generate proper sitemap for SEO purposes. 
@@ -13,8 +13,8 @@ The script will run under Linux operating system which supports Python 3 languag
 - sudo apt-get install python-beautifulsoup
 - sudo apt-get install python-pip
 - sudo apt-get install python3-pip
-- pip install setuptools
-- pip install var_dump
+- pip3 install setuptools
+- pip3 install var_dump
 
 ## USAGE:
 - Set up the 'InitialURL' variable to point to Web site which you want to generate sitemap to

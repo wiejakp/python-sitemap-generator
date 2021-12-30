@@ -1,13 +1,14 @@
 #!/usr/bin/python
 
 # Python Sitemap Generator
-# Version: 0.4
+# Version: 0.4.1
 
 # Przemek Wiejak @ przemek@wiejak.app
 # GitHub: https://github.com/wiejakp/python-sitemap-generator
 
 import threading
 import time
+import sys
 from urllib.request import urlopen
 from urllib.request import Request
 from urllib.request import HTTPError
@@ -23,8 +24,8 @@ from lxml.html.soupparser import fromstring
 # sudo apt-get install python-beautifulsoup
 # sudo apt-get install python-pip
 # sudo apt-get install python3-pip
-# pip install setuptools
-# pip install var_dump
+# pip3 install setuptools
+# pip3 install var_dump
 
 queue = []
 checked = []
@@ -33,15 +34,12 @@ types = 'text/html'
 
 link_threads = []
 
-#MaxThreads = 30
-#MaxSubThreads = 10
-
 # adjust to your liking
-MaxThreads = 20
-MaxSubThreads = 20
+# keep values low to prevent firewalls blocking you for flooding
+MaxThreads = 5
 
 # DWFINE YOUR URL - CUSTOM URL!
-InitialURL = 'https://hublist.pwiam.com/'
+InitialURL = 'HTTPS://SOME_URL.TEST/'
 
 InitialURLInfo = urlparse(InitialURL)
 InitialURLLen = len(InitialURL.split('/'))
@@ -77,6 +75,12 @@ class RunCrawler(threading.Thread):
     print(InitialURL)
     print("")
 
+    if InitialURL == 'HTTPS://SOME_URL.TEST/':
+        print ('')
+        print ('Change "InitialURL" variable and try again!')
+        print ('')
+        sys.exit()
+
     def __init__(self, url):
         threading.Thread.__init__(self)
 
@@ -110,7 +114,7 @@ class RunCrawler(threading.Thread):
 
                 self.done()
             else:
-                print ('Threads: ', len(threads), ' Queue: ', len(queue), ' Checked: ', len(checked), ' Link Threads: ', len(link_threads))
+                print ('Threads: ', len(threads), ' Queue: ', len(queue), ' Checked: ', len(checked), ' Link Threads: ', len(link_threads) + 1)
                 time.sleep(1)
 
     def done(self):
@@ -217,11 +221,17 @@ class Crawl(threading.Thread):
 
                     #var_dump(temp_content)
 
-                    temp_data = fromstring(temp_content)
+                    try:
+                        temp_data = fromstring(temp_content)
+                        temp_thread = threading.Thread(target=ParseThread, args=(self.obj['url'], temp_data))
+                        link_threads.append(temp_thread)
+                        temp_thread.start()
+                    except (RuntimeError, TypeError, NameError, ValueError):
+                        print ('Content could not be parsed, perhaps it is XML? We do not support that yet.')
+                        #var_dump(temp_content)
+                        pass
 
-                    temp_thread = threading.Thread(target=ParseThread, args=(self.obj['url'], temp_data))
-                    link_threads.append(temp_thread)
-                    temp_thread.start()
+
 
         except HTTPError as e:
             temp_status = e.code
