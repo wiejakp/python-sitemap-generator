@@ -1,27 +1,34 @@
-Date: 12/22/2021
-Version: 0.4
+Date: 2021/12/30
+Version: 0.4.1
 
-- upgrade Python version to version 3 (thank you https://github.com/chainstair)
-- fix Python 3 object parameter issue (thank you https://github.com/TudorAndrei)
-- fix issue with URL containing query string
+- Fix (rather ignore) issue with rendering XML pages.
 
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-Date: 05/11/2018
+Date: 2021/12/22
+Version: 0.4
+
+- Upgrade Python version to version 3 (thank you https://github.com/chainstair)
+- Fix Python 3 object parameter issue (thank you https://github.com/TudorAndrei)
+- Fix issue with URL containing query string
+
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+Date: 2018/05/11
 Version: 0.3
 
 - updates and debugging
 
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-Date: 03/15/2016
+Date: 2016/03/15
 Version: 0.2
 
 - Fixed: Date-Modified date format in 'lastmod' XML element
 
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-Date: 03/01/2016
+Date: 2016/03/01
 Version: 0.1
 
 - Initial release
