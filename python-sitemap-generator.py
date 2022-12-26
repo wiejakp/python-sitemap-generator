@@ -40,7 +40,7 @@ link_threads = []
 MaxThreads = 20
 
 # DEFINE YOUR URL - CUSTOM URL!
-InitialURL = 'https://hublist.pwiam.com'
+InitialURL = 'HTTPS://SOME_URL.TEST/'
 
 InitialURLInfo = urlparse(InitialURL)
 InitialURLLen = len(InitialURL.split('/'))
