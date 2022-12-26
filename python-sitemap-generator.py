@@ -11,6 +11,7 @@ import time
 import sys
 from urllib.request import urlopen
 from urllib.request import Request
+from urllib.error import URLError
 from urllib.request import HTTPError
 from urllib.parse import urljoin
 from urllib.parse import urlparse
@@ -36,9 +37,9 @@ link_threads = []
 
 # adjust to your liking
 # keep values low to prevent firewalls blocking you for flooding
-MaxThreads = 5
+MaxThreads = 20
 
-# DWFINE YOUR URL - CUSTOM URL!
+# DEFINE YOUR URL - CUSTOM URL!
 InitialURL = 'HTTPS://SOME_URL.TEST/'
 
 InitialURLInfo = urlparse(InitialURL)
@@ -231,9 +232,13 @@ class Crawl(threading.Thread):
                         #var_dump(temp_content)
                         pass
 
-
+        except URLError as e:
+            print ('URLError: ', self.obj['url'])
+            temp_status = 000
+            pass
 
         except HTTPError as e:
+            print ('HTTPError: ', self.obj['url'])
             temp_status = e.code
             pass
 
