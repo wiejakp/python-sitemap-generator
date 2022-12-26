@@ -1,7 +1,7 @@
 # Python Sitemap Generator
 
-- Version: 0.4.1
-- Update: 2021/12/30
+- Version: 0.4.2
+- Update: 2022/12/26
 - Author: Przemek Wiejak @ przemek@wiejak.app
 
 Python Site Map Generator uses python multi-threaded approach to read all links accessible through the Web site and generate proper sitemap for SEO purposes. 
