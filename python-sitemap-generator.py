@@ -1,9 +1,9 @@
 #!/usr/bin/python
 
 # Python Sitemap Generator
-# Version: 0.4.1
+# Version: 0.4.2
 
-# Przemek Wiejak @ przemek@wiejak.app
+# Przemek Wiejak
 # GitHub: https://github.com/wiejakp/python-sitemap-generator
 
 import threading
