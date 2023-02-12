@@ -7,6 +7,8 @@ Python Site Map Generator uses python multi-threaded approach to read all links 
 Script was meant to use threading technology to allow easy and very fast approach while generating sitemaps for your Web pages.
 The script will run under Linux operating system which supports Python 3 language.
 
+Use with caution, if you set thread count too high, it can cause your web server to bug out and cause some links to throw an error, or your IP will be blocked due to firewall threashold.
+
 ## REQUIREMENTS
 - Python 3
 - sudo apt-get install python-beautifulsoup
