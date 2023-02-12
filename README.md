@@ -13,6 +13,8 @@ The script will run under Linux operating system which supports Python 3 languag
 - sudo apt-get install python-pip
 - sudo apt-get install python3-pip
 - pip3 install setuptools
+- pip3 install bs4
+- pip3 install lxml
 - pip3 install var_dump
 
 ## USAGE:
