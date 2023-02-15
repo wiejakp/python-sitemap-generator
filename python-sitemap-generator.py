@@ -35,9 +35,9 @@ types = 'text/html'
 
 link_threads = []
 
-# adjust to your liking
-# keep values low to prevent firewalls blocking you for flooding
-MaxThreads = 20
+# adjust to your liking but keep values low to prevent firewalls blocking you for flooding
+# or using up all of your web server resources.
+MaxThreads = 4
 
 # DEFINE YOUR URL - CUSTOM URL!
 InitialURL = 'HTTPS://SOME_URL.TEST/'
