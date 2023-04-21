@@ -10,14 +10,7 @@ The script will run under Linux operating system which supports Python 3 languag
 Use with caution, if you set thread count too high, it can cause your web server to bug out and cause some links to throw an error, or your IP will be blocked due to firewall threashold.
 
 ## REQUIREMENTS
-- Python 3
-- sudo apt-get install python-beautifulsoup
-- sudo apt-get install python-pip
-- sudo apt-get install python3-pip
-- pip3 install setuptools
-- pip3 install bs4
-- pip3 install lxml
-- pip3 install var_dump
+The code is updated to newer version. Now it supports `python 3.9`. Now you can use `requirements.txt` to install necessary packages.
 
 ## USAGE:
 - Set up the 'InitialURL' variable to point to Web site which you want to generate sitemap for.
