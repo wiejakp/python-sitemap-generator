@@ -1,0 +1,5 @@
+lxml==4.9.2
+bs4==0.0.1
+beautifulsoup4==4.12.2
+var_dump==1.2
+
