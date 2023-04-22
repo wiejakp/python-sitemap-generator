@@ -1,83 +1,106 @@
-from lxml import etree
-from pprint import pprint
-import email.utils as eut
+import time
+from urllib.parse import urlparse
+from data_management import data_manager
+from crawler import Crawl
+from sitemap import Sitemap
+from argparse import ArgumentParser
 
 
-class Sitemap:
+class RunCrawler:
 
-    def __init__(self):
+    def __init__(self, url, max_threads, filename, initial_url_info):
+        self.max_threads = max_threads
+        self.init_time = time.time()
+        self.filename = filename
+        self.initial_url_info = initial_url_info
 
-        self.urlset = None
-        self.encoding = 'UTF-8'
-        self.xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'
+        data_manager.process_url(url)
 
-    def generate_and_save_sitemap(self, checked_urls, filename):
-        self.urlset = etree.Element('urlset')
-        self.urlset.attrib['xmlns'] = self.xmlns
+    def start_crawling(self):
+        run = True
 
-        self._children(checked_urls)
-        self._save_xml(filename)
+        while run:
+            for index, thread in enumerate(data_manager.get("threads")):
+                if not thread.is_alive():
+                    data_manager.delete("threads", index)
 
-    def _children(self, checked_urls):
-        for index, obj in enumerate(checked_urls):
-            url = etree.Element('url')
-            loc = etree.Element('loc')
-            lastmod = etree.Element('lastmod')
-            changefreq = etree.Element('changefreq')
-            priority = etree.Element('priority')
+            for index, thread in enumerate(data_manager.get("linked_threads")):
+                if not thread.is_alive():
+                    data_manager.delete("linked_threads", index)
 
-            loc.text = obj['url']
-            lastmod_info = None
-            lastmod_header = None
-            lastmod.text = None
+            for index, obj in enumerate(data_manager.get("queue")):
+                if data_manager.len("threads") < self.max_threads:
+                    new_thread = Crawl(index, obj, self.initial_url_info)
+                    data_manager.append("threads", new_thread)
 
-            if hasattr(obj['obj'], 'info'):
-                lastmod_info = obj['obj'].info()
-                lastmod_header = lastmod_info["Last-Modified"]
+                    data_manager.delete("queue", index)
 
-            # check if 'Last-Modified' header exists
-            if lastmod_header is not None:
-                lastmod.text = self._format_date(lastmod_header)
+                else:
+                    break
 
-            if loc.text is not None:
-                url.append(loc)
+            if data_manager.len("queue") == 0 and data_manager.len("threads") == 0 and data_manager.len(
+                    "linked_threads") == 0:
+                run = False
 
-            if lastmod.text is not None:
-                url.append(lastmod)
+                self.done()
+            else:
+                print('Threads: ', data_manager.len("threads"), ' Queue: ', data_manager.len("queue"), ' Checked: ',
+                      data_manager.len("checked"),
+                      ' Link Threads: ',
+                      data_manager.len("linked_threads") + 1)
+                time.sleep(1)
 
-            if changefreq.text is not None:
-                url.append(changefreq)
+    def done(self):
+        print('Checked: ', data_manager.len("checked"))
+        print('Running XML Generator...')
 
-            if priority.text is not None:
-                url.append(priority)
+        # Running sitemap-generating script
+        Sitemap().generate_and_save_sitemap(data_manager.get("checked"), self.filename)
 
-            self.urlset.append(url)
+        print(f"Elapsed Time: {time.time() - self.init_time}")
 
-    def _save_xml(self, filename):
-        f = open(filename, 'w')
 
-        print(etree.tostring(self.urlset, pretty_print=True, encoding="unicode", method="xml"), file=f)
-        f.close()
+def parse_url(url: str):
+    url = url.lower()
+    if not url.startswith("https://"):
+        url = "https://" + url
 
-        print('Sitemap saved in: ', filename)
+    url_parsed = urlparse(url)
+    url_netloc = url_parsed.netloc
+    url_scheme = url_parsed.scheme
+    url_base = url_scheme + '://' + url_netloc
 
-    def _format_date(self, datetime):
-        datearr = eut.parsedate(datetime)
-        date = None
+    netloc_prefix_str = 'www.'
+    netloc_prefix_len = len(netloc_prefix_str)
 
-        try:
-            year = str(datearr[0])
-            month = str(datearr[1])
-            day = str(datearr[2])
+    if url_netloc.startswith(netloc_prefix_str):
+        url_netloc = url_netloc[netloc_prefix_len:]
 
-            if int(month) < 10:
-                month = '0' + month
+    url_info = {
+        "initial_url_base": url_base,
+        "initial_url_netloc": url_netloc,
+        "netloc_prefix_str": netloc_prefix_str,
+        "netloc_prefix_len": netloc_prefix_len,
+    }
 
-            if int(day) < 10:
-                day = '0' + day
+    return url, url_info
 
-            date = year + '-' + month + '-' + day
-        except IndexError:
-            pprint(datearr)
 
-        return date
+if __name__ == "__main__":
+
+    parser = ArgumentParser(description="A python Site Map Generator, that crawl any webpage and generate XML sitemap "
+                                        "compatible with Google's indexing robot.")
+
+    parser.add_argument("-u", "--url", required=True, type=str)
+    parser.add_argument("-f", "--filename", default="sitemap.xml", type=str)
+    parser.add_argument("-mt", "--max-threads", default=4, type=int)
+    args = parser.parse_args()
+
+    url = args.url
+    max_threads = args.max_threads
+    filename = args.filename
+
+    initial_url, initial_url_info = parse_url(url)
+
+    run_crawler = RunCrawler(initial_url, max_threads, filename, initial_url_info)
+    run_crawler.start_crawling()
