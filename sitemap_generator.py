@@ -8,11 +8,12 @@ from argparse import ArgumentParser
 
 class RunCrawler:
 
-    def __init__(self, url, max_threads, filename, initial_url_info):
+    def __init__(self, url, max_threads, filename, initial_url_info, dump):
         self.max_threads = max_threads
         self.init_time = time.time()
         self.filename = filename
         self.initial_url_info = initial_url_info
+        self.dump = dump
 
         data_manager.process_url(url)
 
@@ -30,7 +31,7 @@ class RunCrawler:
 
             for index, obj in enumerate(data_manager.get("queue")):
                 if data_manager.len("threads") < self.max_threads:
-                    new_thread = Crawl(index, obj, self.initial_url_info)
+                    new_thread = Crawl(index, obj, self.initial_url_info, self.dump)
                     data_manager.append("threads", new_thread)
 
                     data_manager.delete("queue", index)
@@ -94,13 +95,15 @@ if __name__ == "__main__":
     parser.add_argument("-u", "--url", required=True, type=str)
     parser.add_argument("-f", "--filename", default="sitemap.xml", type=str)
     parser.add_argument("-mt", "--max-threads", default=4, type=int)
+    parser.add_argument("-d", "--dump", default=-1, help="To show html of pages in console. To enable set it to 1. The default is -1.")
     args = parser.parse_args()
 
     url = args.url
     max_threads = args.max_threads
     filename = args.filename
+    dump = True if args.dump > 0 else False
 
     initial_url, initial_url_info = parse_url(url)
 
-    run_crawler = RunCrawler(initial_url, max_threads, filename, initial_url_info)
+    run_crawler = RunCrawler(initial_url, max_threads, filename, initial_url_info, dump)
     run_crawler.start_crawling()

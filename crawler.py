@@ -4,6 +4,8 @@ from urllib.request import Request
 from urllib.error import URLError
 from urllib.error import HTTPError
 from lxml.html.soupparser import fromstring
+from var_dump import var_dump
+
 from data_management import data_manager
 
 types = 'text/html'
@@ -16,7 +18,7 @@ request_headers = {
 
 class Crawl(threading.Thread):
 
-    def __init__(self, index, obj, initial_url_info):
+    def __init__(self, index, obj, initial_url_info, dump):
         threading.Thread.__init__(self)
 
         self.index = index
