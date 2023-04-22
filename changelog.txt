@@ -4,7 +4,7 @@ Version: 0.5
 - Redisgn and Refactor
 - Support non-ascii urls
 - Add Argument Parser
-_ Add requirements.txt
+- Add requirements.txt
 
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 Date: 2022/12/26
