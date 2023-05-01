@@ -44,7 +44,7 @@ class Crawl(threading.Thread):
                 if types in temp_type:
                     temp_content = temp_res.read()
                     if self.dump:
-                        var_dump(temp_content)
+                        var_dump(temp_content.decode())
 
                     try:
                         temp_data = fromstring(temp_content)
@@ -61,7 +61,7 @@ class Crawl(threading.Thread):
                     except (RuntimeError, TypeError, NameError, ValueError):
                         print('Content could not be parsed, perhaps it is XML? We do not support that yet.')
                         if self.dump:
-                            var_dump(temp_content)
+                            var_dump(temp_content.decode())
                         pass
 
         except HTTPError as e:
