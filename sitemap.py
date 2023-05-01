@@ -8,10 +8,13 @@ class Sitemap:
     def __init__(self):
 
         self.urlset = None
+        self.num_urls = 0
         self.encoding = 'UTF-8'
         self.xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'
 
     def generate_and_save_sitemap(self, checked_urls, filename):
+
+        self.num_urls = len(checked_urls)
         self.urlset = etree.Element('urlset')
         self.urlset.attrib['xmlns'] = self.xmlns
 
@@ -59,6 +62,7 @@ class Sitemap:
         print(etree.tostring(self.urlset, pretty_print=True, encoding="unicode", method="xml"), file=f)
         f.close()
 
+        print(f"Number of saved urls: {self.num_urls}")
         print('Sitemap saved in: ', filename)
 
     def _format_date(self, datetime):
