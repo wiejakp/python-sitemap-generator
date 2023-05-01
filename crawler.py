@@ -52,6 +52,12 @@ class Crawl(threading.Thread):
                                                        args=(self.obj['url'], temp_data))
                         data_manager.append("linked_threads", temp_thread)
                         temp_thread.start()
+
+                        self.obj['obj'] = temp_object
+                        self.obj['sta'] = temp_status
+
+                        data_manager.process_checked(self.obj)
+
                     except (RuntimeError, TypeError, NameError, ValueError):
                         print('Content could not be parsed, perhaps it is XML? We do not support that yet.')
                         # var_dump(temp_content)
@@ -67,10 +73,7 @@ class Crawl(threading.Thread):
             temp_status = 000
             pass
 
-        self.obj['obj'] = temp_object
-        self.obj['sta'] = temp_status
 
-        data_manager.process_checked(self.obj)
 
     def parse_thread(self, url, data):
         temp_links = data.xpath('//a')
