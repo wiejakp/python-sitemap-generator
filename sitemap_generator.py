@@ -104,7 +104,7 @@ if __name__ == "__main__":
     url = args.url
     max_threads = args.max_threads
     filename = args.filename
-    dump = True if args.dump > 0 else False
+    dump = True if int(args.dump) > 0 else False
 
     initial_url, initial_url_info = parse_url(url)
 
