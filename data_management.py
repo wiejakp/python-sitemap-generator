@@ -79,17 +79,25 @@ class DataManagement:
             url_netloc = url_netloc[netloc_prefix_len:]
 
         if url_netloc == '' or url_netloc == initial_url_netloc:
-            url_path = quote(url_info.path, safe="/:&?=#")
-            src_path = quote(src_info.path, safe="/:&?=#")
+
+            url_path = url_info.path
+            if "%" not in url_path:
+                url_path = quote(url_path, safe="/:&?=#")
+
+            src_path = src_info.path
+            if "%" not in src_path:
+                src_path = quote(src_path, safe="/:&?=#")
 
             if url_info.query:
-                url_path = url_path + '?' + url_info.query
+                return value
 
             src_new_path = urljoin(initial_url_base, src_path)
             url_new_path = urljoin(src_new_path, url_path)
 
             path = urljoin(src_new_path, url_new_path)
 
+            if path[-1] != "/":
+                path += "/"
             # print path
 
             value = path
