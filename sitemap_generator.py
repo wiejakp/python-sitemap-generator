@@ -66,6 +66,9 @@ def parse_url(url: str):
     if not url.startswith("https://"):
         url = "https://" + url
 
+    if not url.endswith("/"):
+        url += "/"
+
     url_parsed = urlparse(url)
     url_netloc = url_parsed.netloc
     url_scheme = url_parsed.scheme
