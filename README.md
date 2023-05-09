@@ -16,6 +16,11 @@ The code is updated to newer version which supports `python 3.9`. Now you can us
 - beautifulsoup4
 - var_dump
 
+To install packages using `requirements.txt`, you can run the following command:
+```commandline
+pip install -r requirements.txt
+```
+
 ## USAGE:
 Now, for use the Site Map Generator you can easily use CLI:
 
