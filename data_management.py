@@ -89,7 +89,7 @@ class DataManagement:
                 src_path = quote(src_path, safe="/:&?=#")
 
             if url_info.query:
-                return value
+                url_path = url_path + '?' + url_info.query
 
             src_new_path = urljoin(initial_url_base, src_path)
             url_new_path = urljoin(src_new_path, url_path)
