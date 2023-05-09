@@ -1,3 +1,12 @@
+Date: 2023/04/22
+Version: 0.5
+
+- Redesign and Refactor
+- Support non-ascii urls
+- Add Argument Parser
+- Add requirements.txt
+
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 Date: 2022/12/26
 Version: 0.4.2
 
