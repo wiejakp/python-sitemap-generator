@@ -11,17 +11,11 @@ Use with caution, if you set thread count too high, it can cause your web server
 
 ## REQUIREMENTS
 - Python 3
-- sudo apt-get install python-beautifulsoup
-- sudo apt-get install python-pip
-- sudo apt-get install python3-pip
-- pip3 install setuptools
-- pip3 install bs4
-- pip3 install lxml
-- pip3 install var_dump
+- lxml
+- bs4
 
 ## USAGE:
-- Set up the 'InitialURL' variable to point to Web site which you want to generate sitemap for.
-- Set script to executable: `sudo chmod +x python-sitemap-generator.py`.
-- Run script: `python3 python-sitemap-generator.py`.
+- Install requirements `python3 -m pip install -r requirements.txt`
+- Run script with params: `python3 python-sitemap-generator.py -threads 4 -url https://github.com/ -o sitemap.xml`.
 
 ![Python Sitemap Generator](https://raw.github.com/wiejakp/python-sitemap-generator/master/screenshot.png)

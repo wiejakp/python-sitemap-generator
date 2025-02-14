@@ -1,4 +1,5 @@
 # Local
 .DS_Store
+venv
 
 sitemap.xml

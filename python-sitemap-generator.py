@@ -8,25 +8,20 @@
 
 import threading
 import time
-import sys
+import argparse
+
 from urllib.request import urlopen
 from urllib.request import Request
 from urllib.error import URLError
 from urllib.request import HTTPError
 from urllib.parse import urljoin
 from urllib.parse import urlparse
+
 import email.utils as eut
 
 from pprint import pprint
-from var_dump import var_dump
 from lxml import etree
 from lxml.html.soupparser import fromstring
-
-# sudo apt-get install python-beautifulsoup
-# sudo apt-get install python-pip
-# sudo apt-get install python3-pip
-# pip3 install setuptools
-# pip3 install var_dump
 
 queue = []
 checked = []
@@ -37,16 +32,6 @@ link_threads = []
 
 # adjust to your liking but keep values low to prevent firewalls blocking you for flooding
 # or using up all of your web server resources.
-MaxThreads = 4
-
-# DEFINE YOUR URL - CUSTOM URL!
-InitialURL = 'HTTPS://SOME_URL.TEST/'
-
-InitialURLInfo = urlparse(InitialURL)
-InitialURLLen = len(InitialURL.split('/'))
-InitialURLNetloc = InitialURLInfo.netloc
-InitialURLScheme = InitialURLInfo.scheme
-InitialURLBase = InitialURLScheme + '://' + InitialURLNetloc
 
 netloc_prefix_str = 'www.'
 netloc_prefix_len = len(netloc_prefix_str)
@@ -55,16 +40,12 @@ run_ini = None
 run_end = None
 run_dif = None
 
-filename = 'sitemap.xml'
-
 request_headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:40.0) Gecko/20100101 Firefox/40.0",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     "Connection": "keep-alive"
 }
 
-if InitialURLNetloc.startswith(netloc_prefix_str):
-    InitialURLNetloc = InitialURLNetloc[netloc_prefix_len:]
 
 class RunCrawler(threading.Thread):
     # crawler start
@@ -72,15 +53,6 @@ class RunCrawler(threading.Thread):
     run_end = None
     run_dif = None
 
-    print("")
-    print(InitialURL)
-    print("")
-
-    if InitialURL == 'HTTPS://SOME_URL.TEST/':
-        print ('')
-        print ('Change "InitialURL" variable and try again!')
-        print ('')
-        sys.exit()
 
     def __init__(self, url):
         threading.Thread.__init__(self)
@@ -220,7 +192,6 @@ class Crawl(threading.Thread):
                 if types in temp_type:
                     temp_content = temp_res.read()
 
-                    #var_dump(temp_content)
 
                     try:
                         temp_data = fromstring(temp_content)
@@ -229,7 +200,6 @@ class Crawl(threading.Thread):
                         temp_thread.start()
                     except (RuntimeError, TypeError, NameError, ValueError):
                         print ('Content could not be parsed, perhaps it is XML? We do not support that yet.')
-                        #var_dump(temp_content)
                         pass
 
         except URLError as e:
@@ -289,7 +259,7 @@ def FormatDate(datetime):
 def ParseThread(url, data):
     temp_links = data.xpath('//a')
 
-    for temp_index, temp_link in enumerate(temp_links):
+    for temp_link in temp_links:
         temp_attrs = temp_link.attrib
 
         if 'href' in temp_attrs:
@@ -373,5 +343,28 @@ def ProcessChecked(obj):
 
     if found == False:
         checked.append(obj)
+        
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Process some URLs.')
+    parser.add_argument('-url', type=str, required=True, help='The URL to start crawling from')
+    parser.add_argument('-threads', type=int, default=4, required=False, help='The number of threads to use for crawling (default: 4).')
+    parser.add_argument('-o', type=str, default="sitemap.xml", required=False, help='The output file to save the sitemap to (default: sitemap.xml).')
+    
+    args = parser.parse_args()
+    
+    MaxThreads = args.threads
+    InitialURL = args.url
+    filename = args.o
+    
+    InitialURLInfo = urlparse(InitialURL)
+    InitialURLLen = len(InitialURL.split('/'))
+    InitialURLNetloc = InitialURLInfo.netloc
+    InitialURLScheme = InitialURLInfo.scheme
+    InitialURLBase = InitialURLScheme + '://' + InitialURLNetloc
+    
+    if InitialURLNetloc.startswith(netloc_prefix_str):
+        InitialURLNetloc = InitialURLNetloc[netloc_prefix_len:]
 
-RunCrawler(InitialURL)
+    
+
+    RunCrawler(InitialURL)
